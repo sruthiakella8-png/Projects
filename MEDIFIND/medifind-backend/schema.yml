@@ -1,0 +1,2368 @@
+openapi: 3.0.3
+info:
+  title: MediFind Healthcare Platform API
+  version: 1.0.0
+  description: REST API for the MediFind healthcare platform. Provides authentication,
+    patient services, healthcare provider management, diagnostics, pharmacy workflows,
+    and administrative APIs. Protected endpoints use JWT Bearer authentication.
+paths:
+  /api/admin/dashboard/:
+    get:
+      operationId: admin_dashboard_retrieve
+      description: Admin dashboard statistics.
+      tags:
+      - admin
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/admin/login/:
+    post:
+      operationId: admin_login_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminLogin'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/admin/register/:
+    post:
+      operationId: admin_register_create
+      tags:
+      - admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminRegister'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminRegister'
+          description: ''
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/register/:
+    post:
+      operationId: auth_register_create
+      description: |-
+        Public registration endpoint.
+
+        POST /api/auth/register/
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/auth/test-auth/:
+    get:
+      operationId: auth_test_auth_retrieve
+      tags:
+      - auth
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/auth/token/:
+    post:
+      operationId: auth_token_create
+      description: |-
+        Login using username and password.
+
+        Returns:
+            access
+            refresh
+            role
+            username
+            email
+            phone
+            is_verified
+            user_id
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenObtainPair'
+          description: ''
+  /api/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/diagnostics/{id}/:
+    get:
+      operationId: diagnostics_retrieve
+      description: Returns detailed information about a diagnostic center. Access
+        is restricted to the center itself or an administrator.
+      summary: Get diagnostic center details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsProfile'
+          description: ''
+        '404':
+          description: Diagnostics center not found.
+  /api/diagnostics/{id}/delete/:
+    delete:
+      operationId: diagnostics_delete_destroy
+      description: Permanently deletes a diagnostic center and its associated authentication
+        account. Administrator access is required.
+      summary: Delete diagnostic center
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: Diagnostic center deleted successfully.
+        '404':
+          description: Diagnostics center not found.
+  /api/diagnostics/{id}/verify/:
+    patch:
+      operationId: diagnostics_verify_partial_update
+      description: Approves or rejects a diagnostics center after reviewing its verification
+        submission. Rejection requires a rejection reason.
+      summary: Approve or reject diagnostic center
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Diagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsVerification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsVerification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsVerification'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsVerificationResponse'
+          description: ''
+        '400':
+          description: Invalid verification request.
+        '404':
+          description: Diagnostics center not found.
+  /api/diagnostics/admin/list/:
+    get:
+      operationId: diagnostics_admin_list_list
+      description: Returns diagnostics centers that have submitted verification requests.
+        The optional status query parameter filters results.
+      summary: List diagnostic centers for administration
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiagnosticsProfile'
+          description: ''
+  /api/diagnostics/dashboard/:
+    get:
+      operationId: diagnostics_dashboard_retrieve
+      description: Returns dashboard information for the authenticated diagnostics
+        center, including verification status and diagnostic test counts.
+      summary: Get diagnostic center dashboard
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsDashboard'
+          description: ''
+  /api/diagnostics/dashboard/tests/:
+    get:
+      operationId: diagnostics_dashboard_tests_list
+      description: GET (list) / POST (create) -> /api/diagnostics/dashboard/tests/
+      tags:
+      - diagnostics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DiagnosticTest'
+          description: ''
+    post:
+      operationId: diagnostics_dashboard_tests_create
+      description: GET (list) / POST (create) -> /api/diagnostics/dashboard/tests/
+      tags:
+      - diagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnosticTest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DiagnosticTest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DiagnosticTest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticTest'
+          description: ''
+  /api/diagnostics/dashboard/tests/{id}/:
+    get:
+      operationId: diagnostics_dashboard_tests_retrieve
+      description: Returns a specific diagnostic test belonging to the authenticated
+        diagnostics center.
+      summary: Get diagnostic test
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticTest'
+          description: ''
+        '404':
+          description: Diagnostic test not found.
+    put:
+      operationId: diagnostics_dashboard_tests_update
+      description: Replaces an existing diagnostic test belonging to the authenticated
+        diagnostics center.
+      summary: Update diagnostic test
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Diagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnosticTest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DiagnosticTest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DiagnosticTest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticTest'
+          description: ''
+        '404':
+          description: Diagnostic test not found.
+    patch:
+      operationId: diagnostics_dashboard_tests_partial_update
+      description: Updates selected fields of an existing diagnostic test belonging
+        to the authenticated diagnostics center.
+      summary: Partially update diagnostic test
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Diagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticTest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticTest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticTest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticTest'
+          description: ''
+        '404':
+          description: Diagnostic test not found.
+    delete:
+      operationId: diagnostics_dashboard_tests_destroy
+      description: Deletes a diagnostic test belonging to the authenticated diagnostics
+        center.
+      summary: Delete diagnostic test
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Diagnostic test deleted successfully.
+        '404':
+          description: Diagnostic test not found.
+  /api/diagnostics/patient/:
+    get:
+      operationId: diagnostics_patient_list
+      description: |-
+        GET /api/diagnostics/patient/
+
+        Returns all verified and active diagnostic centers
+        that are visible to patients.
+      tags:
+      - diagnostics
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientDiagnosticsList'
+          description: ''
+  /api/diagnostics/patient/{id}/:
+    get:
+      operationId: diagnostics_patient_retrieve
+      description: |-
+        GET /api/diagnostics/patient/<id>/
+
+        Returns public information about a verified and active
+        diagnostic center.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - diagnostics
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientDiagnosticsDetail'
+          description: ''
+  /api/diagnostics/profile/:
+    get:
+      operationId: diagnostics_profile_retrieve
+      description: Retrieves the profile of the authenticated diagnostics center.
+      summary: Get diagnostic center profile
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsProfile'
+          description: ''
+    patch:
+      operationId: diagnostics_profile_partial_update
+      description: Updates the profile of the authenticated diagnostics center. Availability
+        can only be changed after the center has been verified.
+      summary: Update diagnostic center profile
+      tags:
+      - Diagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsProfileUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsProfileUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsProfileUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsProfile'
+          description: ''
+  /api/diagnostics/profile/documents/:
+    patch:
+      operationId: diagnostics_profile_documents_partial_update
+      description: Uploads or replaces verification documents for the authenticated
+        diagnostics center.
+      summary: Upload verification documents
+      tags:
+      - Diagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsDocumentUpload'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsDocumentUpload'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDiagnosticsDocumentUpload'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsProfile'
+          description: ''
+  /api/diagnostics/profile/submit-verification/:
+    post:
+      operationId: diagnostics_profile_submit_verification_create
+      description: Submits the authenticated diagnostics center for administrator
+        verification after all required profile information and documents have been
+        completed.
+      summary: Submit center for verification
+      tags:
+      - Diagnostics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsSubmitVerificationResponse'
+          description: ''
+        '400':
+          description: Required profile information or documents are missing.
+  /api/diagnostics/register/:
+    post:
+      operationId: diagnostics_register_create
+      description: Register a diagnostics center and create its associated CustomUser
+        authentication account.
+      tags:
+      - diagnostics
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DiagnosticsRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DiagnosticsRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DiagnosticsRegister'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DiagnosticsRegisterResponse'
+          description: ''
+        '400':
+          description: Invalid registration data.
+  /api/doctors/:
+    get:
+      operationId: doctors_list
+      tags:
+      - doctors
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Doctor'
+          description: ''
+  /api/doctors/{id}/:
+    get:
+      operationId: doctors_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - doctors
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doctor'
+          description: ''
+  /api/doctors/{id}/delete/:
+    delete:
+      operationId: doctors_delete_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - doctors
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/doctors/{id}/update/:
+    put:
+      operationId: doctors_update_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Doctor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Doctor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Doctor'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doctor'
+          description: ''
+    patch:
+      operationId: doctors_update_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - doctors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctor'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctor'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedDoctor'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doctor'
+          description: ''
+  /api/doctors/availability/:
+    patch:
+      operationId: doctors_availability_partial_update
+      tags:
+      - doctors
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/doctors/profile/:
+    get:
+      operationId: doctors_profile_retrieve
+      tags:
+      - doctors
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: doctors_profile_update
+      tags:
+      - doctors
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/patient/dashboard/:
+    get:
+      operationId: patient_dashboard_retrieve
+      tags:
+      - patient
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/admin/pharmacies/:
+    get:
+      operationId: pharmacy_admin_pharmacies_retrieve
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/admin/pharmacies/{pharmacy_id}/approve/:
+    post:
+      operationId: pharmacy_admin_pharmacies_approve_create
+      parameters:
+      - in: path
+        name: pharmacy_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/admin/pharmacies/{pharmacy_id}/delete/:
+    delete:
+      operationId: pharmacy_admin_pharmacies_delete_destroy
+      parameters:
+      - in: path
+        name: pharmacy_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/pharmacy/admin/pharmacies/{pharmacy_id}/reject/:
+    post:
+      operationId: pharmacy_admin_pharmacies_reject_create
+      parameters:
+      - in: path
+        name: pharmacy_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/conversations/:
+    get:
+      operationId: pharmacy_conversations_retrieve
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: pharmacy_conversations_create
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/conversations/{conversation_id}/:
+    get:
+      operationId: pharmacy_conversations_retrieve_2
+      parameters:
+      - in: path
+        name: conversation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: pharmacy_conversations_create_2
+      parameters:
+      - in: path
+        name: conversation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/documents/:
+    get:
+      operationId: pharmacy_documents_retrieve
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: pharmacy_documents_create
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/documents/{document_id}/:
+    delete:
+      operationId: pharmacy_documents_destroy
+      parameters:
+      - in: path
+        name: document_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/pharmacy/login/:
+    post:
+      operationId: pharmacy_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - pharmacy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PharmacyLogin'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PharmacyLogin'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PharmacyLogin'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PharmacyLogin'
+          description: ''
+  /api/pharmacy/medicines/:
+    get:
+      operationId: pharmacy_medicines_retrieve
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: pharmacy_medicines_create
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/medicines/{medicine_id}/:
+    get:
+      operationId: pharmacy_medicines_retrieve_2
+      parameters:
+      - in: path
+        name: medicine_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: pharmacy_medicines_update
+      parameters:
+      - in: path
+        name: medicine_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: pharmacy_medicines_partial_update
+      parameters:
+      - in: path
+        name: medicine_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: pharmacy_medicines_destroy
+      parameters:
+      - in: path
+        name: medicine_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/pharmacy/messages/{message_id}/read/:
+    patch:
+      operationId: pharmacy_messages_read_partial_update
+      parameters:
+      - in: path
+        name: message_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/messages/inbox/:
+    get:
+      operationId: pharmacy_messages_inbox_retrieve
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/messages/inbox/{conversation_id}/:
+    get:
+      operationId: pharmacy_messages_inbox_retrieve_2
+      parameters:
+      - in: path
+        name: conversation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: pharmacy_messages_inbox_create
+      parameters:
+      - in: path
+        name: conversation_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/pharmacy/profile/:
+    get:
+      operationId: pharmacy_profile_retrieve
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: pharmacy_profile_update
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: pharmacy_profile_partial_update
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: pharmacy_profile_destroy
+      tags:
+      - pharmacy
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/pharmacy/register/:
+    post:
+      operationId: pharmacy_register_create
+      tags:
+      - pharmacy
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PharmacyRegister'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PharmacyRegister'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PharmacyRegister'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/register/:
+    post:
+      operationId: register_create
+      description: |-
+        Public registration endpoint.
+
+        POST /api/auth/register/
+      tags:
+      - register
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/users/:
+    get:
+      operationId: users_list
+      description: |-
+        Admin-only CRUD operations for users.
+
+        GET     /api/users/
+        POST    /api/users/
+        GET     /api/users/<id>/
+        PUT     /api/users/<id>/
+        PATCH   /api/users/<id>/
+        DELETE  /api/users/<id>/
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserCRUD'
+          description: ''
+    post:
+      operationId: users_create
+      description: |-
+        Admin-only CRUD operations for users.
+
+        GET     /api/users/
+        POST    /api/users/
+        GET     /api/users/<id>/
+        PUT     /api/users/<id>/
+        PATCH   /api/users/<id>/
+        DELETE  /api/users/<id>/
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCRUD'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCRUD'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCRUD'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCRUD'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      description: |-
+        Admin-only CRUD operations for users.
+
+        GET     /api/users/
+        POST    /api/users/
+        GET     /api/users/<id>/
+        PUT     /api/users/<id>/
+        PATCH   /api/users/<id>/
+        DELETE  /api/users/<id>/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCRUD'
+          description: ''
+    put:
+      operationId: users_update
+      description: |-
+        Admin-only CRUD operations for users.
+
+        GET     /api/users/
+        POST    /api/users/
+        GET     /api/users/<id>/
+        PUT     /api/users/<id>/
+        PATCH   /api/users/<id>/
+        DELETE  /api/users/<id>/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCRUD'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCRUD'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCRUD'
+        required: true
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCRUD'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      description: |-
+        Admin-only CRUD operations for users.
+
+        GET     /api/users/
+        POST    /api/users/
+        GET     /api/users/<id>/
+        PUT     /api/users/<id>/
+        PATCH   /api/users/<id>/
+        DELETE  /api/users/<id>/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserCRUD'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserCRUD'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserCRUD'
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCRUD'
+          description: ''
+    delete:
+      operationId: users_destroy
+      description: |-
+        Admin-only CRUD operations for users.
+
+        GET     /api/users/
+        POST    /api/users/
+        GET     /api/users/<id>/
+        PUT     /api/users/<id>/
+        PATCH   /api/users/<id>/
+        DELETE  /api/users/<id>/
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    AdminLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    AdminRegister:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - email
+      - id
+      - password
+      - username
+    AvailabilityEnum:
+      enum:
+      - available
+      - unavailable
+      type: string
+      description: |-
+        * `available` - Available
+        * `unavailable` - Unavailable
+    BlankEnum:
+      enum:
+      - ''
+    CertificationTypeEnum:
+      enum:
+      - nabl
+      - iso
+      - other
+      type: string
+      description: |-
+        * `nabl` - NABL Certified
+        * `iso` - ISO Certified
+        * `other` - Other
+    CustomTokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
+    DiagnosticTest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        test_name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        report_time:
+          type: string
+          maxLength: 50
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - price
+      - test_name
+    DiagnosticsDashboard:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        center_name:
+          type: string
+          maxLength: 150
+        city:
+          type: string
+          maxLength: 100
+        verification_status:
+          $ref: '#/components/schemas/VerificationStatusEnum'
+        total_tests:
+          type: integer
+          readOnly: true
+        active_tests:
+          type: integer
+          readOnly: true
+      required:
+      - active_tests
+      - center_name
+      - id
+      - total_tests
+    DiagnosticsProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        center_name:
+          type: string
+          maxLength: 150
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        phone_number:
+          type: string
+          maxLength: 15
+        diagnostician_name:
+          type: string
+          maxLength: 150
+        license_number:
+          type: string
+          readOnly: true
+        registration_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        certification_type:
+          $ref: '#/components/schemas/CertificationTypeEnum'
+        address:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          maxLength: 100
+        pincode:
+          type: string
+          maxLength: 10
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        government_id:
+          type: string
+          format: uri
+          nullable: true
+        registration_document:
+          type: string
+          format: uri
+          nullable: true
+        certification_document:
+          type: string
+          format: uri
+          nullable: true
+        profile_photo:
+          type: string
+          format: uri
+          nullable: true
+        verification_status:
+          allOf:
+          - $ref: '#/components/schemas/VerificationStatusEnum'
+          readOnly: true
+        verification_submitted:
+          type: boolean
+          readOnly: true
+        rejection_reason:
+          type: string
+          readOnly: true
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        verified_by:
+          type: string
+          readOnly: true
+          nullable: true
+        availability:
+          $ref: '#/components/schemas/AvailabilityEnum'
+        reports_time:
+          type: string
+          maxLength: 50
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+          readOnly: true
+        reviews_count:
+          type: integer
+          readOnly: true
+        home_collection:
+          type: boolean
+        open_24_hours:
+          type: boolean
+        tests_available:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        about:
+          type: string
+        why_choose_us:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        test_count:
+          type: integer
+          readOnly: true
+      required:
+      - center_name
+      - created_at
+      - email
+      - id
+      - is_active
+      - license_number
+      - phone_number
+      - rating
+      - rejection_reason
+      - reviews_count
+      - test_count
+      - updated_at
+      - username
+      - verification_status
+      - verification_submitted
+      - verified_at
+      - verified_by
+      - why_choose_us
+    DiagnosticsRegister:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 255
+        phone_number:
+          type: string
+          maxLength: 15
+        license_number:
+          type: string
+          maxLength: 100
+      required:
+      - email
+      - id
+      - license_number
+      - password
+      - phone_number
+      - username
+    DiagnosticsRegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        user_id:
+          type: integer
+        diagnostics_id:
+          type: integer
+        username:
+          type: string
+        role:
+          type: string
+      required:
+      - diagnostics_id
+      - message
+      - role
+      - user_id
+      - username
+    DiagnosticsSubmitVerificationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/DiagnosticsProfile'
+      required:
+      - data
+      - message
+    DiagnosticsVerification:
+      type: object
+      properties:
+        verification_status:
+          $ref: '#/components/schemas/VerificationStatusEnum'
+        rejection_reason:
+          type: string
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        verified_by:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - verified_at
+      - verified_by
+    DiagnosticsVerificationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/DiagnosticsVerification'
+      required:
+      - data
+      - message
+    Doctor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor_name:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        specialization:
+          type: string
+          maxLength: 255
+        qualification:
+          type: string
+          maxLength: 255
+        experience:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        location:
+          type: string
+          maxLength: 255
+        address:
+          type: string
+        hospital_name:
+          type: string
+          maxLength: 255
+        hospital_location:
+          type: string
+          maxLength: 255
+        consultation_fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        languages:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 20
+        is_available:
+          type: boolean
+        profile_image:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - doctor_name
+      - email
+      - id
+      - username
+    PatchedDiagnosticTest:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        test_name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        report_time:
+          type: string
+          maxLength: 50
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedDiagnosticsDocumentUpload:
+      type: object
+      properties:
+        government_id:
+          type: string
+          format: uri
+          nullable: true
+        registration_document:
+          type: string
+          format: uri
+          nullable: true
+        certification_document:
+          type: string
+          format: uri
+          nullable: true
+    PatchedDiagnosticsProfileUpdate:
+      type: object
+      properties:
+        center_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 15
+        diagnostician_name:
+          type: string
+          maxLength: 150
+        registration_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        certification_type:
+          oneOf:
+          - $ref: '#/components/schemas/CertificationTypeEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        address:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        state:
+          type: string
+          maxLength: 100
+        pincode:
+          type: string
+          maxLength: 10
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        reports_time:
+          type: string
+          maxLength: 50
+        home_collection:
+          type: boolean
+        open_24_hours:
+          type: boolean
+        about:
+          type: string
+        why_choose_us:
+          type: array
+          items:
+            type: string
+        availability:
+          oneOf:
+          - $ref: '#/components/schemas/AvailabilityEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        profile_photo:
+          type: string
+          format: uri
+          nullable: true
+    PatchedDiagnosticsVerification:
+      type: object
+      properties:
+        verification_status:
+          $ref: '#/components/schemas/VerificationStatusEnum'
+        rejection_reason:
+          type: string
+          nullable: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        verified_by:
+          type: string
+          readOnly: true
+          nullable: true
+    PatchedDoctor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        doctor_name:
+          type: string
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        specialization:
+          type: string
+          maxLength: 255
+        qualification:
+          type: string
+          maxLength: 255
+        experience:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        location:
+          type: string
+          maxLength: 255
+        address:
+          type: string
+        hospital_name:
+          type: string
+          maxLength: 255
+        hospital_location:
+          type: string
+          maxLength: 255
+        consultation_fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          nullable: true
+        languages:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 20
+        is_available:
+          type: boolean
+        profile_image:
+          type: string
+          format: uri
+          nullable: true
+    PatchedUserCRUD:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        password:
+          type: string
+          writeOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_verified:
+          type: boolean
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatientDiagnosticTest:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+        report_time:
+          type: string
+      required:
+      - description
+      - id
+      - name
+      - price
+      - report_time
+    PatientDiagnosticsDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        center_name:
+          type: string
+          maxLength: 150
+        certification_type:
+          $ref: '#/components/schemas/CertificationTypeEnum'
+        address:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        phone_number:
+          type: string
+          maxLength: 15
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+        reviews_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        availability:
+          $ref: '#/components/schemas/AvailabilityEnum'
+        reports_time:
+          type: string
+          maxLength: 50
+        home_collection:
+          type: boolean
+        open_24_hours:
+          type: boolean
+        tests_available:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        total_tests:
+          type: integer
+          readOnly: true
+        about:
+          type: string
+        why_choose_us:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        tests:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatientDiagnosticTest'
+          readOnly: true
+      required:
+      - center_name
+      - email
+      - id
+      - phone_number
+      - tests
+      - total_tests
+      - why_choose_us
+    PatientDiagnosticsList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        center_name:
+          type: string
+          maxLength: 150
+        certification_type:
+          $ref: '#/components/schemas/CertificationTypeEnum'
+        address:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 100
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,1})?$
+        reviews_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        availability:
+          $ref: '#/components/schemas/AvailabilityEnum'
+        reports_time:
+          type: string
+          maxLength: 50
+        total_tests:
+          type: integer
+          readOnly: true
+        home_collection:
+          type: boolean
+        open_24_hours:
+          type: boolean
+      required:
+      - center_name
+      - id
+      - total_tests
+    PharmacyLogin:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
+    PharmacyRegister:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+          minLength: 6
+        pharmacy_name:
+          type: string
+          nullable: true
+          maxLength: 200
+        registration_number:
+          type: string
+          nullable: true
+          maxLength: 100
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        email:
+          nullable: true
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+          maxLength: 100
+        state:
+          type: string
+          nullable: true
+          maxLength: 100
+        pincode:
+          type: string
+          nullable: true
+          maxLength: 10
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,7})?$
+          nullable: true
+      required:
+      - password
+      - username
+    RoleEnum:
+      enum:
+      - user
+      - doctor
+      - diagnostics
+      - pharmacy
+      - admin
+      type: string
+      description: |-
+        * `user` - User
+        * `doctor` - Doctor
+        * `diagnostics` - Diagnostics
+        * `pharmacy` - Pharmacy
+        * `admin` - Admin
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    UserCRUD:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        phone:
+          type: string
+          nullable: true
+          maxLength: 15
+        password:
+          type: string
+          writeOnly: true
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_verified:
+          type: boolean
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - updated_at
+      - username
+    VerificationStatusEnum:
+      enum:
+      - pending
+      - verified
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `verified` - Verified
+        * `rejected` - Rejected
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+tags:
+- name: Authentication
+  description: Registration, login, logout, JWT authentication, and token management.
+- name: Administration
+  description: Administrative operations for managing users, healthcare providers,
+    diagnostics centers, pharmacies, and platform workflows.
+- name: Diagnostics
+  description: Diagnostics-center registration, profile management, verification,
+    diagnostic-test management, and patient discovery.
