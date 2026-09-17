@@ -267,43 +267,6 @@ Examples include tests for:
 
 ---
 
-## Project Structure
-
-MEDIFIND/
-│
-├── medifind-backend/
-│   ├── admin_api/
-│   ├── authentication/
-│   ├── diagnostics/
-│   ├── doctors/
-│   ├── pharmacy/
-│   ├── users/
-│   ├── medifind_backend/
-│   ├── tests/
-│   ├── email-template/
-│   ├── manage.py
-│   ├── requirements.txt
-│   ├── schema.yml
-│   └── pytest.ini
-│
-├── medifind-frontend/
-│   ├── src/
-│   │   ├── api/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   └── utils/
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── vite.config.js
-│   └── tailwind.config.js
-│
-├── .gitignore
-└── README.md
-
----
-
 ## Local Development
 
 ### Backend
