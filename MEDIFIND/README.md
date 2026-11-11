@@ -41,6 +41,7 @@ The frontend provides role-specific dashboards and interfaces for interacting wi
 * Healthcare-provider discovery
 * Patient-specific authenticated workflows
 * Role-based access to patient resources
+* Real-time messages and notifications via Websockets
 
 ### 🩺 Doctor Features
 
@@ -48,6 +49,7 @@ The frontend provides role-specific dashboards and interfaces for interacting wi
 * Doctor verification workflows
 * Role-specific doctor access
 * Protected doctor APIs
+* Real-time messages and notifications via Websockets
 
 ### 🧪 Diagnostics Features
 
@@ -57,6 +59,7 @@ The frontend provides role-specific dashboards and interfaces for interacting wi
 * Role-based diagnostic-center authorization
 * Patient listing for diagnostic centers
 * Administrative verification and rejection workflows
+* Real-time messages and notifications via Websockets
 
 ### 💊 Pharmacy Features
 
@@ -101,6 +104,7 @@ My work on MEDIFIND focused primarily on the **patient-facing interface, diagnos
 * Implemented the diagnostics-related functionality across the application
 * Worked on diagnostic-center workflows and interfaces
 * Integrated diagnostics into the application's broader role-based architecture
+* Implemented real-time patient-diagnostician messaging and notifications
 
 ### Role-Based Authentication
 
